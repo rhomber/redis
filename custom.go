@@ -21,6 +21,7 @@ type CustomCmdable interface {
 	StatefulCmdable
 	Do(ctx context.Context, args ...interface{}) *Cmd
 	Process(ctx context.Context, cmd Cmder) error
+	Exec(ctx context.Context, cmds []Cmder) error
 }
 
 type CustomOperator interface {
