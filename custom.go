@@ -21,13 +21,19 @@ type CustomCmdable interface {
 	StatefulCmdable
 	Do(ctx context.Context, args ...interface{}) *Cmd
 	Process(ctx context.Context, cmd Cmder) error
-	Exec(ctx context.Context, cmds []Cmder) error
+	BatchExec(ctx context.Context, cmds []Cmder) error
+	Close() error
+	Discard() error
+	Exec(ctx context.Context) ([]Cmder, error)
 }
 
 type CustomOperator interface {
 	Process(ctx context.Context, cmd Cmder) error
 	Pipeline() Pipeliner
 	Pipelined(ctx context.Context, fn func(Pipeliner) error) ([]Cmder, error)
+	Close() error
+	Discard() error
+	Exec(ctx context.Context) ([]Cmder, error)
 }
 
 var _ CustomCmdable = (*Custom)(nil)
@@ -61,7 +67,7 @@ func (c *Custom) Process(ctx context.Context, cmd Cmder) error {
 }
 
 // Exec passes the given
-func (c *Custom) Exec(ctx context.Context, cmds []Cmder) error {
+func (c *Custom) BatchExec(ctx context.Context, cmds []Cmder) error {
 	return c.exec(ctx, cmds)
 }
 
@@ -79,4 +85,16 @@ func (c *Custom) TxPipelined(ctx context.Context, fn func(Pipeliner) error) ([]C
 
 func (c *Custom) TxPipeline() Pipeliner {
 	return c.op.Pipeline()
+}
+
+func (c *Custom) Close() error {
+	return c.op.Close()
+}
+
+func (c *Custom) Discard() error {
+	return c.op.Discard()
+}
+
+func (c *Custom) Exec(ctx context.Context) ([]Cmder, error) {
+	return c.op.Exec(ctx)
 }
