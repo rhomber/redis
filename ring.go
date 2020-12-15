@@ -13,10 +13,10 @@ import (
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/dgryski/go-rendezvous"
-	"github.com/go-redis/redis/v8/internal"
-	"github.com/go-redis/redis/v8/internal/hashtag"
-	"github.com/go-redis/redis/v8/internal/pool"
-	"github.com/go-redis/redis/v8/internal/rand"
+	"github.com/rhomber/redis/v8/internal"
+	"github.com/rhomber/redis/v8/internal/hashtag"
+	"github.com/rhomber/redis/v8/internal/pool"
+	"github.com/rhomber/redis/v8/internal/rand"
 )
 
 var errRingShardsDown = errors.New("redis: all ring shards are down")
@@ -606,6 +606,10 @@ func (c *Ring) process(ctx context.Context, cmd Cmder) error {
 		}
 	}
 	return lastErr
+}
+
+func (c *Ring) Custom(op CustomOperator) CustomCmdable {
+	panic("Ring.Custom: not implemented")
 }
 
 func (c *Ring) Pipelined(ctx context.Context, fn func(Pipeliner) error) ([]Cmder, error) {

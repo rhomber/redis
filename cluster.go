@@ -12,11 +12,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/go-redis/redis/v8/internal"
-	"github.com/go-redis/redis/v8/internal/hashtag"
-	"github.com/go-redis/redis/v8/internal/pool"
-	"github.com/go-redis/redis/v8/internal/proto"
-	"github.com/go-redis/redis/v8/internal/rand"
+	"github.com/rhomber/redis/v8/internal"
+	"github.com/rhomber/redis/v8/internal/hashtag"
+	"github.com/rhomber/redis/v8/internal/pool"
+	"github.com/rhomber/redis/v8/internal/proto"
+	"github.com/rhomber/redis/v8/internal/rand"
 )
 
 var errClusterNoNodes = fmt.Errorf("redis: cluster has no nodes")
@@ -1054,6 +1054,16 @@ func (c *ClusterClient) reaper(idleCheckFrequency time.Duration) {
 			}
 		}
 	}
+}
+
+func (c *ClusterClient) Custom(op CustomOperator) CustomCmdable {
+	cust := Custom{
+		ctx:  c.ctx,
+		exec: c.processPipeline,
+		op:   op,
+	}
+	cust.init()
+	return &cust
 }
 
 func (c *ClusterClient) Pipeline() Pipeliner {

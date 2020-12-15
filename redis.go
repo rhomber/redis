@@ -7,9 +7,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/go-redis/redis/v8/internal"
-	"github.com/go-redis/redis/v8/internal/pool"
-	"github.com/go-redis/redis/v8/internal/proto"
+	"github.com/rhomber/redis/v8/internal"
+	"github.com/rhomber/redis/v8/internal/pool"
+	"github.com/rhomber/redis/v8/internal/proto"
 	"go.opentelemetry.io/otel/label"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -762,6 +762,16 @@ func (c *Conn) processPipeline(ctx context.Context, cmds []Cmder) error {
 
 func (c *Conn) processTxPipeline(ctx context.Context, cmds []Cmder) error {
 	return c.hooks.processTxPipeline(ctx, cmds, c.baseClient.processTxPipeline)
+}
+
+func (c *Conn) Custom(op CustomOperator) CustomCmdable {
+	cust := Custom{
+		ctx:  c.ctx,
+		exec: c.processPipeline,
+		op:   op,
+	}
+	cust.init()
+	return &cust
 }
 
 func (c *Conn) Pipelined(ctx context.Context, fn func(Pipeliner) error) ([]Cmder, error) {

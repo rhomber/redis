@@ -3,8 +3,8 @@ package redis
 import (
 	"context"
 
-	"github.com/go-redis/redis/v8/internal/pool"
-	"github.com/go-redis/redis/v8/internal/proto"
+	"github.com/rhomber/redis/v8/internal/pool"
+	"github.com/rhomber/redis/v8/internal/proto"
 )
 
 // TxFailedErr transaction redis failed.
@@ -106,6 +106,10 @@ func (c *Tx) Unwatch(ctx context.Context, keys ...string) *StatusCmd {
 	cmd := NewStatusCmd(ctx, args...)
 	_ = c.Process(ctx, cmd)
 	return cmd
+}
+
+func (c *Tx) Custom(op CustomOperator) CustomCmdable {
+	panic("Tx.Custom: not implemented")
 }
 
 // Pipeline creates a pipeline. Usually it is more convenient to use Pipelined.
